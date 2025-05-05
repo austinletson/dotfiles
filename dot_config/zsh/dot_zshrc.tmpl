@@ -88,8 +88,8 @@ tmux_split_with_current_command() {
 # Create the widget from the function
 zle -N tmux_split_with_current_command
 
-# Bind Ctrl-n to the widget
-bindkey '^|' tmux_split_with_current_command
+# Bind Ctrl-\ to the widget
+bindkey '^\' tmux_split_with_current_command
 
 
 # OSC 133 prompt jump so tmux can jump to last prompt
