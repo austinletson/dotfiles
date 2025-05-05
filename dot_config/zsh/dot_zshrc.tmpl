@@ -63,9 +63,33 @@ autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '^e' edit-command-line
 
-# Create widget and bind in one step
-zle -N tmux_split_with_current_command '(tmux split-window -h "$BUFFER" &)'
-bindkey '^n' tmux_split_with_current_command
+# Widget to run current command in new tmux pane
+tmux_split_with_current_command() {
+  # First check if we're in a tmux session
+  if [[ -z "$TMUX" ]]; then
+    zle -M "Not in a tmux session"
+    return 1
+  fi
+
+  # Get the current command line content
+  local cmd="$BUFFER"
+  
+  # Only proceed if there's actually a command
+  if [[ -n "$cmd" ]]; then
+    # Execute tmux split-window with the current command
+    # Using zsh's silent command execution with the () syntax
+    (tmux split-window -h "$cmd" &)
+    
+    # Clear the editing buffer
+    BUFFER=""; CURSOR=0; zle redisplay
+  fi
+}
+
+# Create the widget from the function
+zle -N tmux_split_with_current_command
+
+# Bind Ctrl-n to the widget
+bindkey '^|' tmux_split_with_current_command
 
 
 # OSC 133 prompt jump so tmux can jump to last prompt
@@ -84,9 +108,11 @@ autoload -U compinit; compinit
 source ~/.config/zsh/fzf-tab/fzf-tab.plugin.zsh
 
 # fish like highlighting and autosuggestions
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 {{ if eq .chezmoi.hostname "austin-desktop" }}
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+{{ else if eq .chezmoi.hostname "fedora" }}
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 {{ end }}
 
 # -- setup programs with shell interaction --
