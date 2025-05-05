@@ -63,6 +63,11 @@ autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '^e' edit-command-line
 
+# Create widget and bind in one step
+zle -N tmux_split_with_current_command '(tmux split-window -h "$BUFFER" &)'
+bindkey '^n' tmux_split_with_current_command
+
+
 # OSC 133 prompt jump so tmux can jump to last prompt
 preexec () {
   echo -n "\\x1b]133;A\\x1b\\"
@@ -80,7 +85,9 @@ source ~/.config/zsh/fzf-tab/fzf-tab.plugin.zsh
 
 # fish like highlighting and autosuggestions
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+{{ if eq .chezmoi.hostname "austin-desktop" }}
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+{{ end }}
 
 # -- setup programs with shell interaction --
 
@@ -92,7 +99,9 @@ source <(fzf --zsh)
 eval "$(zoxide init zsh)"
 
 # -- br --
+{{ if eq .chezmoi.hostname "austin-desktop" }}
 source /home/austin/.config/broot/launcher/bash/br
+{{ end }}
 
 # -- python environment --
 
